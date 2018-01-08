@@ -157,13 +157,15 @@ __fz_generate_matches() {
 __fz_bash_completion() {
   COMPREPLY=()
 
-  local selected slug
+  local selected slug fzf
   eval "slug=${COMP_WORDS[@]:(-1)}"
+
+  fzf="$(__fzfcmd_complete)"
 
   if [[ "$(__fz_generate_matches "$slug" | head | wc -l)" -gt 1 ]]; then
     selected=$(__fz_generate_matches "$slug" \
       | FZF_DEFAULT_OPTS="--height ${FZF_TMUX_HEIGHT:-40%} --reverse \
-      --bind 'shift-tab:up,tab:down' $FZF_DEFAULT_OPTS" fzf)
+      --bind 'shift-tab:up,tab:down' $FZF_DEFAULT_OPTS" ${=fzf})
   elif [[ "$(__fz_generate_matches "$slug" | head | wc -l)" -eq 1 ]]; then
     selected=$(__fz_generate_matches "$slug")
   else
@@ -189,7 +191,7 @@ __fz_bash_completion() {
 
 __fz_zsh_completion() {
   setopt localoptions noshwordsplit noksh_arrays noposixbuiltins nonomatch
-  local args cmd selected slug
+  local args cmd selected slug fzf
 
   args=(${(z)LBUFFER})
   cmd=${args[1]}
@@ -205,10 +207,12 @@ __fz_zsh_completion() {
     eval "slug=${args[-1]}"
   fi
 
+  fzf="$(__fzfcmd_complete)"
+
   if [[ "$(__fz_generate_matches "$slug" | head | wc -l)" -gt 1 ]]; then
     selected=$(__fz_generate_matches "$slug" \
       | FZF_DEFAULT_OPTS="--height ${FZF_TMUX_HEIGHT:-40%} --reverse \
-      --bind 'shift-tab:up,tab:down' $FZF_DEFAULT_OPTS" fzf)
+      --bind 'shift-tab:up,tab:down' $FZF_DEFAULT_OPTS" ${=fzf})
   elif [[ "$(__fz_generate_matches "$slug" | head | wc -l)" -eq 1 ]]; then
     selected=$(__fz_generate_matches "$slug")
   else
